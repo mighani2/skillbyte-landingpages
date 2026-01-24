@@ -1,14 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 40" fill="none">
-  <defs>
-    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#06b6d4"/>
-      <stop offset="100%" style="stop-color:#8b5cf6"/>
-    </linearGradient>
-  </defs>
-  <!-- Icon -->
-  <path d="M8 8h8v8H8V8zm0 16h8v8H8v-8zm16-16h8v8h-8V8zm0 16h8v8h-8v-8z" fill="url(#logoGradient)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
   <!-- Text -->
-  <text x="48" y="28" font-family="Inter, sans-serif" font-size="20" font-weight="600" fill="#1e293b">
+  <text x="0" y="28" font-family="Inter, sans-serif" font-size="20" font-weight="600" fill="#1e293b">
     <tspan fill="#06b6d4">skill</tspan><tspan fill="#1e293b">byte</tspan>
   </text>
 </svg>

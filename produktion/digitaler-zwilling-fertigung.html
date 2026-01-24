@@ -23,6 +23,9 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+
+    <!-- Cookie Consent -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.css">
 </head>
 <body>
     <!-- Header -->
@@ -182,5 +185,90 @@
 
     <!-- Optional: Analytics Script Placeholder -->
     <!-- {{analytics_script}} -->
+
+    <!-- Cookie Consent -->
+    <script type="module">
+        import 'https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.umd.js';
+
+        CookieConsent.run({
+            guiOptions: {
+                consentModal: {
+                    layout: 'box inline',
+                    position: 'bottom left'
+                },
+                preferencesModal: {
+                    layout: 'box'
+                }
+            },
+            categories: {
+                necessary: {
+                    enabled: true,
+                    readOnly: true
+                },
+                analytics: {
+                    autoClear: {
+                        cookies: [
+                            { name: /^_ga/ },
+                            { name: '_gid' }
+                        ]
+                    }
+                },
+                marketing: {
+                    autoClear: {
+                        cookies: [
+                            { name: /^_fb/ }
+                        ]
+                    }
+                }
+            },
+            language: {
+                default: 'de',
+                translations: {
+                    de: {
+                        consentModal: {
+                            title: 'Wir verwenden Cookies',
+                            description: 'Wir nutzen Cookies, um Ihnen die bestmögliche Erfahrung auf unserer Website zu bieten. Einige sind notwendig, andere helfen uns, die Website zu verbessern und Ihnen relevante Inhalte anzuzeigen.',
+                            acceptAllBtn: 'Alle akzeptieren',
+                            acceptNecessaryBtn: 'Nur notwendige',
+                            showPreferencesBtn: 'Einstellungen verwalten',
+                            footer: '<a href="https://www.skillbyte.de/rechtliches/datenschutz" target="_blank">Datenschutzerklärung</a>'
+                        },
+                        preferencesModal: {
+                            title: 'Cookie-Einstellungen',
+                            acceptAllBtn: 'Alle akzeptieren',
+                            acceptNecessaryBtn: 'Nur notwendige',
+                            savePreferencesBtn: 'Einstellungen speichern',
+                            closeIconLabel: 'Schließen',
+                            sections: [
+                                {
+                                    title: 'Cookie-Nutzung',
+                                    description: 'Wir verwenden Cookies, um grundlegende Funktionen der Website zu ermöglichen und um zu verstehen, wie Sie unsere Website nutzen. Sie können für jede Kategorie wählen, ob Sie diese zulassen möchten oder nicht.'
+                                },
+                                {
+                                    title: 'Notwendige Cookies',
+                                    description: 'Diese Cookies sind für das ordnungsgemäße Funktionieren der Website erforderlich und können nicht deaktiviert werden.',
+                                    linkedCategory: 'necessary'
+                                },
+                                {
+                                    title: 'Analyse-Cookies',
+                                    description: 'Diese Cookies helfen uns zu verstehen, wie Besucher mit unserer Website interagieren, indem sie Informationen anonym sammeln und melden.',
+                                    linkedCategory: 'analytics'
+                                },
+                                {
+                                    title: 'Marketing-Cookies',
+                                    description: 'Diese Cookies werden verwendet, um Werbung für Sie relevanter zu machen. Sie können auch die Häufigkeit begrenzen, mit der Sie eine Anzeige sehen.',
+                                    linkedCategory: 'marketing'
+                                },
+                                {
+                                    title: 'Weitere Informationen',
+                                    description: 'Bei Fragen zu unserer Cookie-Richtlinie kontaktieren Sie uns bitte über unsere <a href="https://www.skillbyte.de/kontakt" target="_blank">Kontaktseite</a>.'
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

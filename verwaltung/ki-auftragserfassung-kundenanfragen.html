@@ -116,38 +116,32 @@
             <h2>Starten Sie Ihr KI-Projekt</h2>
             <p>Lassen Sie uns gemeinsam herausfinden, wie KI-Auftragserfassung Ihr Unternehmen voranbringen kann.</p>
             
-            <form class="contact-form" action="https://formsubmit.co/39e33674ce1158a883a03d47a339422a" method="POST">
-                <!-- FormSubmit configuration -->
-                <input type="hidden" name="_subject" value="Neue Anfrage: KI-Auftragserfassung - Verwaltung">
-                <input type="hidden" name="_next" value="https://insights.skillbyte.de/danke.html">
-                <input type="hidden" name="_template" value="table">
-                <input type="text" name="_honey" style="display:none">
-
+            <form class="contact-form" action="https://formgrid.dev/api/f/qyqh73ha" method="POST">
                 <!-- Hidden fields for tracking -->
-                <input type="hidden" name="Landingpage" value="verwaltung/ki-auftragserfassung-kundenanfragen">
-                <input type="hidden" name="Technologie" value="KI-Auftragserfassung">
-                <input type="hidden" name="Branche" value="Verwaltung">
+                <input type="hidden" name="landingpage" value="verwaltung/ki-auftragserfassung-kundenanfragen">
+                <input type="hidden" name="technologie" value="KI-Auftragserfassung">
+                <input type="hidden" name="branche" value="Verwaltung">
 
                 <div class="form-group">
                     <label for="company">Unternehmen *</label>
                     <input type="text" id="company" name="company" required placeholder="Ihr Unternehmen">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="name">Ihr Name *</label>
                     <input type="text" id="name" name="name" required placeholder="Vor- und Nachname">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">E-Mail-Adresse *</label>
                     <input type="email" id="email" name="email" required placeholder="ihre@email.de">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="phone">Telefon (optional)</label>
                     <input type="tel" id="phone" name="phone" placeholder="+49 123 456789">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="employees">Unternehmensgröße</label>
                     <select id="employees" name="employees">
@@ -158,18 +152,20 @@
                         <option value="1000+">1000+ Mitarbeiter</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="message">Ihre Nachricht (optional)</label>
                     <textarea id="message" name="message" placeholder="Beschreiben Sie kurz Ihr Anliegen oder Ihre aktuelle Herausforderung..."></textarea>
                 </div>
-                
+
+                <div class="form-group" style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <input type="checkbox" id="privacy" name="privacy" value="1" required style="margin-top: 0.25rem;">
+                    <label for="privacy" style="font-size: 0.875rem; color: #64748b; cursor: pointer;">
+                        Ich habe die <a href="https://www.skillbyte.de/rechtliches/datenschutz" target="_blank" style="color: var(--accent-cyan);">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu. *
+                    </label>
+                </div>
+
                 <button type="submit" class="submit-btn">Kostenlose Beratung anfragen</button>
-                
-                <p style="font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center;">
-                    Mit dem Absenden stimmen Sie unserer 
-                    <a href="https://www.skillbyte.de/rechtliches/datenschutz" target="_blank" style="color: var(--accent-cyan);">Datenschutzerklärung</a> zu.
-                </p>
             </form>
         </div>
     </section>

@@ -1,0 +1,15 @@
+{
+  "name": "skillbyte-landingpages-build",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Build tooling for the insights.skillbyte.de site. Extracts Claude-Design bundles (~2.5 MB self-decoding HTML) into flat, SEO-friendly static output suitable for paid ads.",
+  "scripts": {
+    "extract": "node extract.mjs"
+  },
+  "dependencies": {
+    "esbuild": "^0.24.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

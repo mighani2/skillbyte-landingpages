@@ -1,0 +1,627 @@
+/* Landing page-specific styles, layered on top of skillbyte design system */
+
+/* =========================================================================
+   skillbyte Design System — Foundational tokens
+   Colors, typography, spacing, radii, shadows
+   ------------------------------------------------------------------------
+   Brand context: skillbyte is a German AI consultancy for the industrial
+   Mittelstand. The brand is clean, professional, friendly, tech-forward.
+   Cyan is the energetic brand signal. Lavender/violet is the secondary
+   accent used for "AI / KI" moments and gradient treatments.
+   ========================================================================= */
+
+/* ----- Plus Jakarta Sans (display + body) — uploaded brand files -------- */
+/* Variable font (preferred, full weight range) */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url("fonts/PlusJakartaSans-Variable.ttf") format('truetype-variations'),
+       url("fonts/PlusJakartaSans-Variable.ttf") format('truetype');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url("fonts/PlusJakartaSans-Italic-Variable.ttf") format('truetype-variations'),
+       url("fonts/PlusJakartaSans-Italic-Variable.ttf") format('truetype');
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+/* Static weight fallbacks */
+
+
+
+
+
+
+
+
+/* Inter (body) + JetBrains Mono (code) still pulled from Google Fonts —
+   no brand file was supplied for these. If you have the real files,
+   drop them into fonts/ and replace these imports with @font-face blocks. */
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* greek-ext */
+
+/* greek */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* greek-ext */
+
+/* greek */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* greek-ext */
+
+/* greek */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* greek-ext */
+
+/* greek */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* greek */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* greek */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+
+
+:root {
+  /* =====================================================================
+     COLOR — Brand primary (cyan) — from logo
+     Named skillbyte cyan. Use for primary buttons, key accents, the logo.
+     ===================================================================== */
+  --sb-cyan-50:  #EAFBFD;
+  --sb-cyan-100: #CAF4FA;
+  --sb-cyan-200: #9BE9F3;
+  --sb-cyan-300: #5FD8E8;
+  --sb-cyan-400: #32C6DA; /* logo */
+  --sb-cyan-500: #22C6DA; /* PRIMARY — same as logo mark */
+  --sb-cyan-600: #0FA6BB;
+  --sb-cyan-700: #0C8495;
+  --sb-cyan-800: #0C6672;
+  --sb-cyan-900: #0B4F58;
+
+  /* =====================================================================
+     COLOR — Secondary (violet/lavender) — AI/KI accent, gradients
+     ===================================================================== */
+  --sb-violet-50:  #F3F0FF;
+  --sb-violet-100: #E7E0FF;
+  --sb-violet-200: #CFC4FE;
+  --sb-violet-300: #B4A6FC;
+  --sb-violet-400: #9C8BF9;
+  --sb-violet-500: #7C6DF3; /* ACCENT */
+  --sb-violet-600: #6152E1;
+  --sb-violet-700: #4E42BF;
+  --sb-violet-800: #3E3897;
+  --sb-violet-900: #2E2971;
+
+  /* =====================================================================
+     COLOR — Neutrals (ink + paper + grays)
+     Anchored to a slightly cool, high-contrast ink for headlines.
+     ===================================================================== */
+  --sb-ink:        #1F2330; /* headline ink, logo wordmark */
+  --sb-ink-soft:   #2C3040;
+  --sb-slate-900:  #1F2330;
+  --sb-slate-800:  #2C3040;
+  --sb-slate-700:  #3B4052;
+  --sb-slate-600:  #555A6B;
+  --sb-slate-500:  #757B8C;
+  --sb-slate-400:  #9CA1B1;
+  --sb-slate-300:  #C5C9D4;
+  --sb-slate-200:  #E3E5EC;
+  --sb-slate-100:  #EFF1F5;
+  --sb-slate-50:   #F6F7FA;
+  --sb-paper:      #FFFFFF;
+  --sb-canvas:     #FAFBFC; /* page background — softer than white */
+
+  /* =====================================================================
+     COLOR — Semantic (status / feedback)
+     ===================================================================== */
+  --sb-success:   #10B981;
+  --sb-success-bg:#E8F8F1;
+  --sb-warning:   #F59E0B;
+  --sb-warning-bg:#FEF3DD;
+  --sb-danger:    #EF4444;
+  --sb-danger-bg: #FDECEC;
+  --sb-info:      var(--sb-cyan-500);
+  --sb-info-bg:   var(--sb-cyan-50);
+
+  /* =====================================================================
+     COLOR — Semantic foreground / background roles
+     Use these in components; they indirect to the palette above.
+     ===================================================================== */
+  --fg-1:       var(--sb-ink);        /* primary text / headlines */
+  --fg-2:       var(--sb-slate-700);  /* body text */
+  --fg-3:       var(--sb-slate-500);  /* secondary / meta */
+  --fg-4:       var(--sb-slate-400);  /* disabled / placeholder */
+  --fg-on-primary: #FFFFFF;
+  --fg-on-accent:  #FFFFFF;
+  --fg-link:    var(--sb-cyan-700);
+
+  --bg-1:       var(--sb-paper);      /* surfaces / cards */
+  --bg-2:       var(--sb-canvas);     /* page background */
+  --bg-3:       var(--sb-slate-50);   /* subtle panels */
+  --bg-4:       var(--sb-slate-100);  /* tag / chip backgrounds */
+  --bg-inverse: var(--sb-ink);        /* dark surfaces / dark hero */
+
+  --border-1:   var(--sb-slate-200);  /* standard border */
+  --border-2:   var(--sb-slate-100);  /* subtle divider */
+  --border-strong: var(--sb-slate-300);
+
+  /* =====================================================================
+     GRADIENTS — signature "AI" gradient (lavender → cyan)
+     Used on progress bars, glyph tiles, highlighted KI chips.
+     ===================================================================== */
+  --gradient-ai:        linear-gradient(90deg, #9C8BF9 0%, #7C8BF8 50%, #5FD8E8 100%);
+  --gradient-ai-soft:   linear-gradient(135deg, #EEE7FF 0%, #DFF4FA 100%);
+  --gradient-cyan:      linear-gradient(135deg, var(--sb-cyan-400), var(--sb-cyan-600));
+  --gradient-violet:    linear-gradient(135deg, var(--sb-violet-400), var(--sb-violet-600));
+  --gradient-hero:      linear-gradient(180deg, #FAFBFC 0%, #F1F3F9 100%);
+  --gradient-panel-ai:  linear-gradient(180deg, #F8F7FF 0%, #EEF9FB 100%);
+
+  /* =====================================================================
+     TYPOGRAPHY — families
+     ===================================================================== */
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, SFMono-Regular, 'Fira Code', monospace;
+
+  /* Fluid type scale (desktop-first). Headlines use display family.     */
+  --fs-display-xl: clamp(48px, 5.5vw, 72px);
+  --fs-display-lg: clamp(40px, 4.5vw, 56px);
+  --fs-h1:         clamp(34px, 3.8vw, 44px);
+  --fs-h2:         clamp(26px, 2.8vw, 34px);
+  --fs-h3:         22px;
+  --fs-h4:         18px;
+  --fs-body-lg:    18px;
+  --fs-body:       16px;
+  --fs-body-sm:    14px;
+  --fs-caption:    13px;
+  --fs-eyebrow:    12px; /* UPPERCASE tracking labels e.g. "KI-LÖSUNG" */
+
+  --lh-tight:  1.1;
+  --lh-snug:   1.25;
+  --lh-normal: 1.5;
+  --lh-loose:  1.7;
+
+  --tracking-tight:   -0.02em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.04em;
+  --tracking-eyebrow: 0.14em; /* for KI-LÖSUNG-style labels */
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semi:    600;
+  --fw-bold:    700;
+  --fw-xbold:   800;
+
+  /* =====================================================================
+     SPACING — 4px base scale
+     ===================================================================== */
+  --space-0:   0;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+  --space-32:  128px;
+
+  --container-max: 1200px;
+  --container-gutter: 24px;
+
+  /* =====================================================================
+     RADII — generally generous, the brand is soft & rounded
+     ===================================================================== */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-pill: 999px;
+
+  /* =====================================================================
+     ELEVATION — soft, layered shadows (not hard drop shadows)
+     ===================================================================== */
+  --shadow-xs: 0 1px 2px rgba(25, 30, 50, 0.05);
+  --shadow-sm: 0 2px 6px rgba(25, 30, 50, 0.06);
+  --shadow-md: 0 8px 24px rgba(25, 30, 50, 0.08);
+  --shadow-lg: 0 20px 50px rgba(25, 30, 50, 0.10);
+  --shadow-xl: 0 40px 80px -20px rgba(25, 30, 50, 0.18);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.6);
+  --ring-focus: 0 0 0 4px rgba(34, 198, 218, 0.25);
+
+  /* =====================================================================
+     MOTION
+     ===================================================================== */
+  --ease-out:    cubic-bezier(0.22, 0.8, 0.28, 1);
+  --ease-in-out: cubic-bezier(0.65, 0.05, 0.36, 1);
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    400ms;
+}
+
+/* =========================================================================
+   SEMANTIC TYPOGRAPHY DEFAULTS
+   Apply to HTML tags where it's safe; scope component styles with classes.
+   ========================================================================= */
+html {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: var(--fg-2);
+  background: var(--bg-2);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body { margin: 0; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--fg-1);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--lh-tight);
+  margin: 0 0 var(--space-4) 0;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--fs-h1); font-weight: var(--fw-xbold); }
+h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); }
+h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); }
+h4 { font-size: var(--fs-h4); font-weight: var(--fw-semi); }
+
+p { margin: 0 0 var(--space-4) 0; color: var(--fg-2); line-height: var(--lh-normal); text-wrap: pretty; }
+
+.sb-display-xl { font-family: var(--font-display); font-size: var(--fs-display-xl); font-weight: var(--fw-xbold); line-height: var(--lh-tight); letter-spacing: var(--tracking-tight); color: var(--fg-1); }
+.sb-display-lg { font-family: var(--font-display); font-size: var(--fs-display-lg); font-weight: var(--fw-xbold); line-height: var(--lh-tight); letter-spacing: var(--tracking-tight); color: var(--fg-1); }
+.sb-h1         { font-family: var(--font-display); font-size: var(--fs-h1); font-weight: var(--fw-xbold); line-height: var(--lh-tight); letter-spacing: var(--tracking-tight); color: var(--fg-1); }
+.sb-h2         { font-family: var(--font-display); font-size: var(--fs-h2); font-weight: var(--fw-bold);  line-height: var(--lh-snug);  letter-spacing: var(--tracking-tight); color: var(--fg-1); }
+.sb-h3         { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: var(--fw-bold);  color: var(--fg-1); }
+.sb-h4         { font-family: var(--font-display); font-size: var(--fs-h4); font-weight: var(--fw-semi); color: var(--fg-1); }
+.sb-body-lg    { font-family: var(--font-body); font-size: var(--fs-body-lg); line-height: var(--lh-normal); color: var(--fg-2); }
+.sb-body       { font-family: var(--font-body); font-size: var(--fs-body);    line-height: var(--lh-normal); color: var(--fg-2); }
+.sb-body-sm    { font-family: var(--font-body); font-size: var(--fs-body-sm); line-height: var(--lh-normal); color: var(--fg-2); }
+.sb-caption    { font-family: var(--font-body); font-size: var(--fs-caption); line-height: var(--lh-normal); color: var(--fg-3); }
+.sb-eyebrow    { font-family: var(--font-body); font-size: var(--fs-eyebrow); font-weight: var(--fw-semi); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--sb-violet-600); }
+.sb-code       { font-family: var(--font-mono); font-size: var(--fs-body-sm); color: var(--fg-2); background: var(--bg-3); padding: 2px 6px; border-radius: var(--radius-xs); }
+
+
+/* ---- Page reset ---- */
+html, body { margin: 0; padding: 0; background: var(--bg-2); }
+* { box-sizing: border-box; }
+a { color: inherit; }
+
+/* ---- Theme: subtle production-planning grid backdrop ---- */
+.planning-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-2) 1px, transparent 1px);
+  background-size: 56px 28px; /* wider rows = more "Gantt-row" feel */
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(0,0,0,0.45), transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(0,0,0,0.45), transparent 75%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* time-tick column markers — barely visible vertical accent */
+.time-tick-bg {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0,
+    transparent 159px,
+    rgba(124,109,243,0.06) 159px,
+    rgba(124,109,243,0.06) 160px
+  );
+  pointer-events: none;
+}
+
+/* Section eyebrow with conflict-marker dot */
+.eyebrow-with-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--sb-violet-600);
+}
+.eyebrow-with-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--sb-violet-500);
+  box-shadow: 0 0 0 4px rgba(124,109,243,0.18);
+}
+
+/* Buttons */
+.btn-primary {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  border: none;
+  background: var(--sb-cyan-500);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s var(--ease-out), box-shadow .15s, background .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary:hover {
+  background: var(--sb-cyan-600);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+
+.btn-ghost {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  border: 1.5px solid var(--sb-ink);
+  background: transparent;
+  color: var(--sb-ink);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ghost:hover { background: var(--sb-ink); color: #fff; }
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--sb-cyan-700);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-link:hover { color: var(--sb-cyan-600); }
+
+/* Tag / KI-LÖSUNG style chips */
+.kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--sb-violet-50);
+  color: var(--sb-violet-600);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* fade/translate scroll-reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- Specific: planning-mock card ---- */
+.gantt-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  height: 38px;
+  border-bottom: 1px dashed var(--border-2);
+  padding: 0 4px;
+}
+.gantt-row:last-child { border-bottom: none; }
+.gantt-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.gantt-track {
+  position: relative;
+  height: 22px;
+  background: var(--sb-slate-50);
+  border-radius: 6px;
+}
+.gantt-bar {
+  position: absolute;
+  top: 3px; bottom: 3px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gantt-bar.cyan { background: linear-gradient(90deg, var(--sb-cyan-400), var(--sb-cyan-600)); }
+.gantt-bar.violet { background: linear-gradient(90deg, var(--sb-violet-400), var(--sb-violet-600)); }
+.gantt-bar.muted { background: var(--sb-slate-300); color: var(--fg-1); }
+.gantt-bar.conflict {
+  background: repeating-linear-gradient(45deg, #FCA5A5 0 6px, #F87171 6px 12px);
+  color: #7F1D1D;
+}
+.conflict-marker {
+  position: absolute;
+  top: -10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #EF4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 11px;
+  color: #EF4444;
+  box-shadow: 0 4px 10px rgba(239,68,68,0.3);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 4px 10px rgba(239,68,68,0.3), 0 0 0 0 rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 4px 10px rgba(239,68,68,0.3), 0 0 0 8px rgba(239,68,68,0); }
+}
+
+/* check marker — for "validated" plans */
+.check-marker {
+  position: absolute;
+  top: -10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--sb-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(16,185,129,0.3);
+}
+
+/* dependency line */
+.dep-line {
+  position: absolute;
+  border-left: 1.5px dashed var(--sb-violet-400);
+  pointer-events: none;
+}
+
+/* form */
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-2);
+}
+.form-field input,
+.form-field textarea,
+.form-field select {
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-1);
+  background: #fff;
+  color: var(--fg-1);
+  outline: none;
+  resize: vertical;
+  transition: border-color .15s, box-shadow .15s;
+}
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: var(--sb-cyan-500);
+  box-shadow: var(--ring-focus);
+}
+.form-field input.invalid,
+.form-field textarea.invalid {
+  border-color: var(--sb-danger);
+}
+.field-err {
+  font-size: 11.5px;
+  color: var(--sb-danger);
+  margin-top: -2px;
+}
+
+/* container utility */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+@media (max-width: 860px) {
+  .grid-2 { grid-template-columns: 1fr !important; }
+  .grid-3 { grid-template-columns: 1fr !important; }
+  .grid-4 { grid-template-columns: 1fr 1fr !important; }
+  .hide-mobile { display: none !important; }
+}
+
+
+/* Page-specific overrides */

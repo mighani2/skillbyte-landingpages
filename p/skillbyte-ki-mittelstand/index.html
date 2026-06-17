@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Effiziente Prozesse dank passgenauer KI-Lösungen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js-menu@2.1.0/menu.css">
+<style id="wd-theme">
+/* webdeck theme.css — skillbyte house layouts on top of reveal.js.
+ *
+ * Ported from templates/deck-md (the video deck), but for an INTERACTIVE
+ * reveal.js web page, NOT a paused-timeline video render. Differences:
+ *   - reveal.js owns slide visibility / nav / transitions; the mode-A/B
+ *     ".slide" opacity-mutex + z-index layering is GONE (reveal handles it).
+ *   - reveal runs at a 1920x1080 VIRTUAL size (see init.js width/height), so the
+ *     deck-md px sizes (128px h1, 360px stat, ...) keep their proportions and
+ *     reveal scales the whole deck to fit any screen.
+ *   - reveal.js fragments drive step-by-step reveals (bullets, terminal/chat
+ *     lines) — no GSAP timeline needed for the common case. GSAP is layered only
+ *     on the few "concept" slides via window.WD.register (see init.js).
+ *
+ * The deck's front-matter `accent` is injected as --accent-1 in a small override
+ * <style> AFTER this file by the builder; everything here reads the vars. */
+
+/* ── Brand tokens (defaults; --accent-1 overridden per deck) ───────────────── */
+:root {
+  --accent-1: #6366F1;   /* indigo */
+  --accent-2: #06B6D4;   /* electric cyan */
+  --accent-term: #6366F1;/* bold lead-in term colour (brand indigo/violet); fixed,
+                            independent of the per-deck `accent` --accent-1 override */
+  --accent-term-dark: #818CF8; /* lighter indigo for the same term on dark slides */
+  --ink:      #0A0E1A;   /* dark ink for text on paper slides */
+  --muted:    #475569;   /* secondary ink */
+  --paper:    #FFFFFF;   /* light slide background */
+  --night:    #0A0E1A;   /* dark slide background */
+  --safe:     100px;     /* slide safe-zone padding */
+}
+
+/* ── reveal.js base overrides — full-bleed slides, house typography ─────────── */
+html, body { background: var(--night); }
+.reveal { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.reveal .slides { text-align: left; }
+/* Each <section> fills the 1920x1080 virtual area; our .wd-canvas paints it. */
+.reveal .slides section {
+  width: 1920px; height: 1080px; padding: 0; top: 0 !important;
+  box-sizing: border-box; overflow: hidden;
+}
+.reveal .slides section.present { display: flex; }
+
+/* The native-HTML content surface (replaces deck-md's .slide-canvas). */
+.wd-canvas {
+  position: absolute; inset: 0;
+  width: 1920px; height: 1080px;
+  box-sizing: border-box;   /* keep padding INSIDE 1920×1080 (else canvas = 1920+2×safe and full-width content clips) */
+  display: flex; flex-direction: column;
+  padding: var(--safe);
+  background: var(--paper); color: var(--ink);
+}
+.wd-canvas.dark { background: var(--night); color: #fff; }
+
+/* reveal.js heading reset so our per-layout sizes win. */
+.reveal h1, .reveal h2, .reveal h3, .reveal p, .reveal blockquote {
+  margin: 0; text-transform: none; letter-spacing: normal; color: inherit; font-weight: inherit;
+}
+.reveal a { color: var(--accent-1); }
+.reveal ::selection { background: var(--accent-1); color: #fff; }
+
+/* ── LAYOUT KIT (the webdeck.md `layout:` vocabulary) ──────────────────────────
+   title | bullets | two-col | big-stat | quote | image-full | chart | code |
+   terminal | chat. Each is a flex container inside .wd-canvas. */
+
+/* layout: title — hero opener / section divider. Use .dark canvas. */
+.s-title { justify-content: center; gap: 28px; }
+.s-title .overline {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 600;
+  font-size: 30px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent-2);
+}
+.s-title h1 { font-size: 128px; font-weight: 800; line-height: 1.02; max-width: 1500px; }
+.s-title .sub { font-size: 44px; font-weight: 500; color: rgba(255,255,255,0.72); max-width: 1300px; }
+.wd-canvas:not(.dark).s-title .sub { color: var(--muted); }
+/* small viewer-navigation hint — clearly subordinate to the subtitle/claim */
+.s-title .nav-hint {
+  margin-top: 18px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 600;
+  font-size: 22px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.42);
+}
+.s-title .nav-hint::before { content: "↓ "; color: var(--accent-2); }
+.wd-canvas:not(.dark).s-title .nav-hint { color: rgba(15,23,42,0.45); }
+
+/* layout: bullets — heading + step-revealed list (one beat per item). */
+.s-bullets { justify-content: center; gap: 40px; }
+.s-bullets h2 { font-size: 72px; font-weight: 800; line-height: 1.05; max-width: 1500px; }
+.s-bullets ul { list-style: none; display: flex; flex-direction: column; gap: 28px; }
+/* plain block li with an absolutely-positioned marker — a `**bold** — text`
+   bullet has two child nodes, and a flex li would split them into two columns
+   (bold shrinks to its own narrow column). Normal text flow keeps them inline
+   and wraps at max-width. Same fix as `.s-case .case-col li`. */
+.s-bullets li {
+  position: relative; padding-left: 46px;
+  font-size: 46px; font-weight: 500; line-height: 1.25; max-width: 1500px;
+}
+.s-bullets li::before {
+  content: ""; position: absolute; left: 0; top: 18px;
+  width: 22px; height: 22px; border-radius: 6px;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+}
+/* colour the bold lead-in term (e.g. "Machine Learning") to break up text-heavy
+   bullet slides — violet term + accent marker + ink body = a clean 3-tone scan. */
+.s-bullets li strong { color: var(--accent-term); font-weight: 700; }
+.wd-canvas.dark.s-bullets li strong { color: var(--accent-term-dark); }
+
+/* layout: two-col — left text, right panel (list / note). */
+.s-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-content: center; }
+.s-two-col .col-head { font-size: 64px; font-weight: 800; line-height: 1.06; }
+.s-two-col .col-body { margin-top: 28px; font-size: 40px; color: var(--muted); line-height: 1.3; }
+.wd-canvas.dark .s-two-col .col-body, .s-two-col.dark .col-body { color: rgba(255,255,255,0.72); }
+.s-two-col .col-panel {
+  align-self: center; border-radius: 24px; padding: 48px;
+  background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.18);
+}
+.s-two-col .col-panel ul { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+.s-two-col .col-panel li { font-size: 36px; line-height: 1.25; display: flex; gap: 16px; }
+.s-two-col .col-panel li::before { content: "→"; color: var(--accent-2); font-weight: 700; }
+
+/* layout: big-stat — one huge number + label. Use .dark canvas. */
+.s-big-stat { justify-content: center; align-items: flex-start; gap: 20px; }
+.s-big-stat .stat {
+  font-size: 360px; font-weight: 900; line-height: 0.9;
+  background: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.s-big-stat .stat-label { font-size: 52px; font-weight: 600; color: rgba(255,255,255,0.8); max-width: 1400px; }
+.wd-canvas:not(.dark).s-big-stat .stat-label { color: var(--muted); }
+
+/* layout: team — heading + a row of circular avatar cards (![Name](path) per
+   person). Avatars are masked to circles; names sit under each. */
+.s-team { justify-content: center; gap: 40px; }
+.s-team h2 { font-size: 72px; font-weight: 800; line-height: 1.05; max-width: 1500px; }
+.s-team .team-sub { font-size: 40px; font-weight: 500; color: var(--muted); max-width: 1500px; }
+.wd-canvas.dark .s-team .team-sub { color: rgba(255,255,255,0.72); }
+.s-team .team-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 80px; margin-top: 24px; }
+.s-team .team-card { display: flex; flex-direction: column; align-items: center; gap: 28px; width: 320px; }
+.s-team .team-card img {
+  width: 240px; height: 240px; border-radius: 50%; object-fit: cover; margin: 0;
+  border: 5px solid var(--accent-2); box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+.s-team .team-name { font-size: 36px; font-weight: 700; line-height: 1.2; text-align: center; }
+
+/* layout: people — contact / speaker row. Like team, but each card carries a
+   title + description (from the bullet) under the name, so the photo sits BEHIND
+   the person's name+role instead of a text-only bullet. */
+.s-people { justify-content: center; gap: 32px; }
+.s-people h2 { font-size: 72px; font-weight: 800; line-height: 1.05; max-width: 1500px; }
+.s-people .people-sub { font-size: 38px; font-weight: 500; color: var(--muted); max-width: 1500px; }
+.wd-canvas.dark .s-people .people-sub { color: rgba(255,255,255,0.72); }
+.s-people .people-grid { display: flex; justify-content: center; align-items: flex-start; gap: 64px; margin-top: 30px; }
+.s-people .people-card { display: flex; flex-direction: column; align-items: center; text-align: center; width: 460px; gap: 16px; }
+.s-people .people-card img {
+  width: 240px; height: 240px; border-radius: 50%; object-fit: cover; margin: 0;
+  border: 5px solid var(--accent-2); box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+.s-people .people-name { font-size: 42px; font-weight: 800; line-height: 1.15; }
+.s-people .people-title { font-size: 28px; font-weight: 700; color: var(--accent-term); line-height: 1.2; }
+.wd-canvas.dark .s-people .people-title { color: var(--accent-term-dark); }
+.s-people .people-desc { font-size: 26px; font-weight: 500; color: var(--muted); line-height: 1.3; }
+.wd-canvas.dark .s-people .people-desc { color: rgba(255,255,255,0.7); }
+
+/* layout: about — company intro + bold tagline + big-number stat row + a quiet
+   customer-logo strip (the first image). Light canvas by default. */
+.s-about { justify-content: center; gap: 0; }
+.s-about .overline {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 600;
+  font-size: 28px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent-2);
+  margin-bottom: 18px;
+}
+.s-about h2 { font-size: 84px; font-weight: 800; line-height: 1.04; }
+.s-about .about-intro { margin-top: 26px; font-size: 38px; line-height: 1.32; color: var(--muted); max-width: 1500px; }
+.wd-canvas.dark .s-about .about-intro { color: rgba(255,255,255,0.72); }
+.s-about .about-tag {
+  margin-top: 24px; font-size: 42px; font-weight: 700; line-height: 1.2; max-width: 1500px;
+  background: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.s-about .about-stats { margin-top: 52px; display: flex; gap: 120px; }
+.s-about .about-stat .num {
+  font-size: 116px; font-weight: 900; line-height: 0.95;
+  background: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.s-about .about-stat .lbl {
+  margin-top: 8px; font-size: 30px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+}
+.wd-canvas.dark .s-about .about-stat .lbl { color: rgba(255,255,255,0.7); }
+.s-about .about-logos { margin-top: 64px; width: 100%; max-width: 1700px; }
+.s-about .about-logos-cap {
+  font-size: 24px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); opacity: 0.75; margin-bottom: 26px;
+}
+.s-about .about-logos img { width: 100%; height: auto; display: block; opacity: 0.7; margin: 0; }
+
+/* layout: case — customer case study: CASE STUDY badge + title + company meta
+   line + a left→right flow of columns (### heads). The last column is the
+   accented "result". Dark canvas by default (matches the PDF case slides). */
+.s-case { justify-content: flex-start; gap: 0; padding-top: 84px; padding-bottom: 72px; }
+.s-case .case-badge {
+  align-self: flex-start; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 700; font-size: 24px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--accent-2); padding: 12px 26px; border-radius: 9999px;
+  border: 1px solid rgba(6,182,212,0.45); margin-bottom: 26px;
+}
+.s-case .case-title { font-size: 66px; font-weight: 800; line-height: 1.05; max-width: 1720px; }
+.s-case .case-meta {
+  margin-top: 20px; padding-bottom: 26px; font-size: 30px; font-weight: 600;
+  color: rgba(255,255,255,0.66); border-bottom: 1px solid rgba(255,255,255,0.14);
+}
+.s-case .case-cols {
+  margin-top: 44px; width: 100%; box-sizing: border-box;
+  display: flex; gap: 30px; align-items: stretch;
+}
+.s-case .case-col {
+  position: relative; flex: 1 1 0; min-width: 0;   /* equal columns; min-width:0 lets text wrap */
+  box-sizing: border-box; border-radius: 22px; padding: 34px 32px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
+}
+/* flow arrow between columns */
+.s-case .case-col + .case-col::before {
+  content: "→"; position: absolute; left: -30px; top: 50%; transform: translateY(-50%);
+  font-size: 40px; font-weight: 700; color: var(--accent-2); opacity: 0.85;
+}
+.s-case .case-col.result {
+  background: linear-gradient(160deg, rgba(99,102,241,0.22), rgba(6,182,212,0.16));
+  border-color: rgba(99,102,241,0.5);
+}
+.s-case .case-col-head {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700;
+  font-size: 24px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent-2); margin-bottom: 24px;
+}
+.s-case .case-col.result .case-col-head { color: #fff; }
+.s-case .case-col ul { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+/* plain block li with an absolutely-positioned marker — normal text flow wraps at
+   the column width and can never overflow (grid/flex 1fr tracks misbehaved here). */
+.s-case .case-col li {
+  position: relative; padding-left: 30px; overflow-wrap: anywhere;
+  font-size: 30px; font-weight: 500; line-height: 1.28; color: rgba(255,255,255,0.9);
+}
+.s-case .case-col li::before {
+  content: ""; position: absolute; left: 0; top: 11px; width: 12px; height: 12px;
+  border-radius: 4px; background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+}
+.s-case .case-col.result li { padding-left: 38px; }
+.s-case .case-col.result li::before {
+  content: "✓"; top: 0; width: auto; height: auto; border-radius: 0;
+  background: none; color: var(--accent-2); font-weight: 800; font-size: 28px;
+}
+
+/* layout: quote — pull quote + attribution. */
+.s-quote { justify-content: center; gap: 44px; }
+.s-quote blockquote { font-size: 76px; font-weight: 700; line-height: 1.18; max-width: 1600px; border: 0; box-shadow: none; background: none; font-style: normal; }
+.s-quote blockquote::before { content: "\201C"; color: var(--accent-1); }
+.s-quote .by { font-size: 38px; font-weight: 600; color: var(--accent-2); }
+
+/* layout: image-full — full-bleed image with optional caption band. */
+.s-image-full { padding: 0; }
+.s-image-full img { position: absolute; inset: 0; width: 1920px; height: 1080px; object-fit: cover; margin: 0; border: 0; box-shadow: none; }
+.s-image-full .cap {
+  position: absolute; left: var(--safe); bottom: 80px; max-width: 1300px;
+  padding: 24px 36px; border-radius: 16px;
+  background: rgba(10,14,26,0.92); color: #fff; font-size: 40px; font-weight: 600;
+}
+
+/* layout: chart — heading + a real CSS chart (NOT a screenshot). Bars from
+   `- Label: value` data lines; the builder sets each bar's height %. */
+.s-chart { justify-content: center; gap: 48px; }
+.s-chart h2 { font-size: 64px; font-weight: 800; }
+.s-chart .bars { display: flex; align-items: flex-end; gap: 48px; height: 520px; }
+.s-chart .bar-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.s-chart .bar { width: 180px; border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, var(--accent-1), var(--accent-2)); }
+.s-chart .bar-label { margin-top: 16px; font-size: 32px; font-weight: 600; color: var(--muted); text-align: center; }
+.wd-canvas.dark .s-chart .bar-label { color: rgba(255,255,255,0.72); }
+
+/* layout: code — a syntax-highlighted code block (highlight.js plugin). */
+.s-code { justify-content: center; gap: 36px; }
+.s-code h2 { font-size: 60px; font-weight: 800; }
+.s-code pre { width: 1500px; max-width: 100%; margin: 0; box-shadow: 0 30px 80px rgba(0,0,0,0.45); border-radius: 16px; font-size: 34px; }
+.s-code pre code { padding: 36px 40px; border-radius: 16px; max-height: 760px; font-family: 'JetBrains Mono', ui-monospace, monospace; line-height: 1.4; }
+
+/* layout: terminal — agent tool-call log / shell session (rich component). */
+.s-terminal { justify-content: center; align-items: center; gap: 40px; }
+/* optional heading above a terminal/chat mount (left-aligned over the 1500px card) */
+.s-terminal .wd-rich-head, .s-chat .wd-rich-head {
+  font-size: 56px; font-weight: 800; line-height: 1.05; width: 1500px; max-width: 100%;
+}
+.term {
+  width: 1500px; max-width: 100%; border-radius: 16px; overflow: hidden;
+  background: #0B1020; border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.term-bar { display: flex; align-items: center; gap: 10px; padding: 16px 22px;
+  background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.term-dot { width: 14px; height: 14px; border-radius: 50%; }
+.term-dot-r { background: #FF5F56; } .term-dot-y { background: #FFBD2E; } .term-dot-g { background: #27C93F; }
+.term-title { margin-left: 12px; font-size: 24px; color: rgba(255,255,255,0.55); }
+.term-body { padding: 28px 32px; display: flex; flex-direction: column; gap: 12px;
+  font-size: 32px; line-height: 1.35; color: #E6EAF2; }
+.term-line { display: flex; gap: 12px; white-space: pre-wrap; word-break: break-word; }
+.t-sigil { flex: 0 0 auto; font-weight: 700; }
+.t-cmd { color: #8AB4F8; }
+.t-out { color: #C7CEDA; }
+.t-prompt { color: #fff; font-weight: 600; } .t-prompt .t-sigil { color: var(--accent-2); }
+.t-think { color: #8A93A6; font-style: italic; }
+.t-tool { color: var(--accent-1); } .t-tool .t-sigil { color: var(--accent-1); }
+.t-res { color: #34D399; } .t-res .t-sigil { color: #34D399; }
+.t-err { color: #F87171; } .t-err .t-sigil { color: #F87171; }
+.t-say { color: #fff; } .t-say .t-sigil { color: var(--accent-2); }
+.t-cmt { color: #6B7280; }
+
+/* layout: chat — prompt-engineering / chat-UX dialogue (rich component). */
+.s-chat { justify-content: center; }
+.chat { width: 1500px; max-width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.chat-row { display: flex; flex-direction: column; gap: 8px; max-width: 78%; }
+.chat-role { font-size: 24px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.chat-bubble { font-size: 36px; line-height: 1.3; padding: 26px 32px; border-radius: 22px; white-space: pre-wrap; word-break: break-word; }
+.chat-user { align-self: flex-end; align-items: flex-end; }
+.chat-user .chat-bubble { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; border-bottom-right-radius: 6px; }
+.chat-assistant { align-self: flex-start; align-items: flex-start; }
+.chat-assistant .chat-bubble { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.20); color: var(--ink); border-bottom-left-radius: 6px; }
+.wd-canvas.dark .chat-assistant .chat-bubble { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); color: #fff; }
+.chat-system { align-self: center; max-width: 88%; }
+.chat-system .chat-bubble { background: rgba(148,163,184,0.12); color: var(--muted); font-style: italic; }
+
+/* ── Concept-animation glow-frame — for GSAP-layered "concept" slides. With live
+   DOM you set left/top/width/height from the element's offset box (no PIL). ─── */
+.cf-frame {
+  position: absolute; border-radius: 14px; border: 3px solid var(--accent-1);
+  background: rgba(99,102,241,0.06);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.12), 0 0 26px 6px rgba(99,102,241,0.40);
+  opacity: 0; pointer-events: none; z-index: 5;
+}
+.cf-frame.warn { border-color: #DC2626; background: rgba(220,38,38,0.06);
+  box-shadow: 0 0 0 2px rgba(220,38,38,0.12), 0 0 26px 6px rgba(220,38,38,0.40); }
+
+/* ── reveal.js chrome tinted to brand ──────────────────────────────────────── */
+.reveal .progress { color: var(--accent-2); height: 6px; }
+.reveal .controls { color: var(--accent-2); }
+.reveal .slide-number { background: rgba(10,14,26,0.6); font-family: 'JetBrains Mono', monospace; }
+
+</style>
+<style>:root{--accent-1:#06B6D4;}</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+<section id="slide-1" data-layout="title" data-background-color="#0A0E1A">
+  <div class="wd-canvas dark s-title">
+<div class="overline">skillbyte · KI für den industriellen Mittelstand</div>
+<h1>Effiziente Prozesse dank passgenauer KI-Lösungen</h1>
+<div class="sub">KI-Dienstleistungen für den industriellen Mittelstand: Von der Beratung bis zur Implementierung.</div>
+<div class="nav-hint">Scrollen oder Pfeiltaste drücken</div>
+  </div>
+</section>
+<section id="slide-2" data-layout="about" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-about">
+<div class="overline">Über skillbyte</div>
+<h2>Über skillbyte</h2>
+<div class="about-intro">Wir unterstützen den industriellen Mittelstand dabei, Künstliche Intelligenz gewinnbringend einzusetzen und so Verwaltungs- und Produktionsprozesse effizient zu gestalten.</div>
+<div class="about-tag">Wir entwickeln nicht nur Lösungen. Wir denken mit. Wir bauen Vertrauen. Wir begleiten.</div>
+<div class="about-stats"><div class="about-stat"><div class="num">2012</div><div class="lbl">Gründung</div></div><div class="about-stat"><div class="num">35+</div><div class="lbl">Mitarbeitende</div></div><div class="about-stat"><div class="num">50+</div><div class="lbl">Kunden</div></div></div>
+<div class="about-logos"><div class="about-logos-cap">Unternehmen, die uns vertrauen</div><img src="assets/customer-logos.png" alt="Kunden von skillbyte"></div>
+  </div>
+</section>
+<section id="slide-3" data-layout="bullets" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-bullets">
+<h2>Geballte Expertise im Bereich Künstliche Intelligenz</h2>
+<ul><li class="fragment"><strong>Machine Learning</strong> — z.B. für intelligente Instandhaltung oder Optimierung der Produktionsplanung</li><li class="fragment"><strong>Natural Language Processing</strong> — z.B. für intelligenten Service (Chatbots) oder Dokumentation</li><li class="fragment"><strong>Computer Vision</strong> — z.B. für Qualitätssicherung, Montagekontrolle oder Roboterführung</li><li class="fragment"><strong>Embeddings</strong> — z.B. für smartes Wissensmanagement oder Anomalieerkennungssysteme</li><li class="fragment"><strong>LLMs &amp; Agentic AI</strong> — z.B. für die Prozesssteuerung und automatisierte Compliance-Lösungen</li></ul>
+  </div>
+</section>
+<section id="slide-4" data-layout="team" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-team">
+<h2>KI-Projektleitung bei skillbyte</h2>
+<div class="team-sub">Erfahrene KI-Expertinnen und -Experten begleiten Ihr Projekt von der ersten Idee bis in den produktiven Betrieb — auf Augenhöhe mit Ihren Verantwortlichen.</div>
+<div class="team-grid"><div class="team-card"><img src="assets/team-weiden.png" alt="Dr. Andreas Weiden"><div class="team-name">Dr. Andreas Weiden</div></div><div class="team-card"><img src="assets/team-isik.png" alt="Emre Isik"><div class="team-name">Emre Isik</div></div><div class="team-card"><img src="assets/team-villmow.png" alt="Dr. Johannes Villmow"><div class="team-name">Dr. Johannes Villmow</div></div><div class="team-card"><img src="assets/team-wrzalik.png" alt="Dr. Marco Wrzalik"><div class="team-name">Dr. Marco Wrzalik</div></div></div>
+  </div>
+</section>
+<section id="slide-5" data-layout="two-col" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-two-col">
+<div><div class="col-head">Strategische Partnerschaft für KI-Erfolge im Mittelstand</div><div class="col-body"><strong>TROESTER × skillbyte</strong> — AI Experience trifft Extrusion Excellence. Gemeinsam bringen wir tiefe KI-Expertise und über 130 Jahre Industrie-Erfahrung zusammen.</div></div><div class="col-panel"><ul><li>Verbindung von 130+ Jahren Industrie-Erfahrung und tiefer KI-Expertise</li><li>Konsequente Digitalisierung von Verwaltung und Produktion</li><li>Reichweite und Knowhow für schnelle Praxis-Erfolge</li><li>Laufende Optimierung durch gegenseitige Impulse und Innovation</li></ul></div>
+  </div>
+</section>
+<section id="slide-6" data-layout="bullets" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-bullets">
+<h2>Herausfordernde Zeiten für Produktionsunternehmen</h2>
+<ul><li class="fragment"><strong>Fachkräftemangel</strong> — Fehlende interne Expertise und demografischer Wandel</li><li class="fragment"><strong>Datensouveränität</strong> — US-Tools, Cyberkriminalität und geopolitische Spannungen</li><li class="fragment"><strong>Hype um KI</strong> — Zugzwang beim KI-Einsatz, um wettbewerbsfähig zu bleiben</li><li class="fragment"><strong>KI-Implementierung</strong> — Projekte fressen Ressourcen ohne messbaren Erfolg</li><li class="fragment"><strong>Legacy-Prozesse</strong> — Veraltete, aber essenzielle Standard-Software</li></ul>
+  </div>
+</section>
+<section id="slide-7" data-layout="bullets" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-bullets">
+<h2>… verlangen nach passgenauen KI-Lösungen!</h2>
+<ul><li class="fragment"><strong>Fachkräftemangel</strong> → Automatisierung von Routineaufgaben, freie Ressourcen durch digitalisiertes Wissen</li><li class="fragment"><strong>Datensouveränität</strong> → Sichere, proprietäre KI-Individuallösungen mit Datenschutz &amp; Compliance</li><li class="fragment"><strong>Hype um KI</strong> → AI-ProcessGuard für den Einstieg, Praxiserfolge mit messbarem ROI</li><li class="fragment"><strong>KI-Implementierung</strong> → Gezielte Pilotierung und spezialisierte MVPs, minimales Risiko</li><li class="fragment"><strong>Legacy-Prozesse</strong> → Native KI-Integration in bestehende Software</li></ul>
+  </div>
+</section>
+<section id="slide-8" data-layout="bullets" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-bullets">
+<h2>AI-ProcessGuard — unser Framework für erfolgreiche KI-Projekte</h2>
+<ul><li class="fragment"><strong>Schritt 1</strong> — KI-Beratung &amp; Workshop</li><li class="fragment"><strong>Schritt 2</strong> — Datenexploration &amp; Analyse</li><li class="fragment"><strong>Schritt 3</strong> — Proof of Concept &amp; MVP</li><li class="fragment"><strong>Schritt 4</strong> — KI-Entwicklung &amp; Implementierung</li></ul>
+  </div>
+</section>
+<section id="slide-9" data-layout="two-col" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-two-col">
+<div><div class="col-head">Schritt 1 — KI-Beratung &amp; Workshop</div><div class="col-body">Finden Sie eine KI-Lösung, die sich lohnt. Der Workshop dreht sich konkret darum, wie KI in Ihr Unternehmen passt — mit Best Practices, Praxisbeispielen und einem Blick auf Ihre Prozesse.</div></div><div class="col-panel"><ul><li>Passgenaue KI-Beratung</li><li>Praxisnahe Einordnung &amp; Best Practices</li><li>Blick auf Ihre Prozesse</li><li>Skizze eines rentablen Use Cases</li></ul></div>
+  </div>
+</section>
+<section id="slide-10" data-layout="two-col" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-two-col">
+<div><div class="col-head">Schritt 2 — Datenexploration &amp; Analyse</div><div class="col-body">Lassen Sie Ihre Datenstruktur durchleuchten. Wir prüfen, ob Ihre Daten KI-ready sind, evaluieren passende Modelle und zeigen das Einsparpotenzial transparent auf.</div></div><div class="col-panel"><ul><li>Datencheck: Qualität, Bereinigung, Aufbereitung</li><li>Evaluation von KI-Modellen &amp; Algorithmen</li><li>Transparente Empfehlungen zur Umsetzbarkeit</li><li>Erster ROI-Ausblick</li></ul></div>
+  </div>
+</section>
+<section id="slide-11" data-layout="two-col" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-two-col">
+<div><div class="col-head">Schritt 3 — Proof of Concept &amp; MVP</div><div class="col-body">Pilotieren Sie Ihre individuelle KI-Lösung mit minimalem Risiko. Bevor Sie in die volle Umsetzung investieren, beweist ein MVP den Mehrwert in Ihrer Praxis.</div></div><div class="col-panel"><ul><li>Detaillierter Tech-Fahrplan</li><li>Pilotierung &amp; MVP Ihrer KI-Lösung</li><li>ROI-Analyse zu Ihrem KI-Projekt</li><li>Transparentes, unverbindliches Angebot zur Umsetzung</li></ul></div>
+  </div>
+</section>
+<section id="slide-12" data-layout="two-col" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-two-col">
+<div><div class="col-head">Schritt 4 — KI-Entwicklung &amp; Implementierung</div><div class="col-body">Lassen Sie Ihre KI-Lösung von Experten umsetzen. Im engen Austausch zwischen unserem Projektteam und Ihren KI-Verantwortlichen steuern wir Ihr Projekt in Richtung Erfolg.</div></div><div class="col-panel"><ul><li>State-of-the-art Entwicklung &amp; Implementierung</li><li>Integration in Ihre Infrastruktur</li><li>Strategische Partnerschaft auf Augenhöhe</li><li>Signifikante Prozessoptimierung als Wettbewerbsvorteil</li></ul></div>
+  </div>
+</section>
+<section id="slide-13" data-layout="case" data-background-color="#0A0E1A">
+  <div class="wd-canvas dark s-case">
+<div class="case-badge">Case Study</div>
+<h2 class="case-title">90 % weniger Aufwand dank automatisiertem ESG-Reporting</h2>
+<div class="case-meta">TROESTER GmbH &amp; Co. KG · &gt; 650 Mitarbeitende · Maschinenbau (Kautschuk, Kabel, Compounding)</div>
+<div class="case-cols"><div class="case-col fragment"><div class="case-col-head">Herausforderung</div><ul><li>Pflicht zur ESG-Berichterstattung</li><li>Datenchaos in der Systemlandschaft: ERP, HR-System, Betriebsdaten, Berichte</li><li>Hoher zeitlicher und personeller Aufwand</li></ul></div><div class="case-col fragment"><div class="case-col-head">skillbyte-Lösung</div><ul><li>KI-basierte Datenextraktion &amp; CO₂-Klassifizierung</li><li>Automatisierte Aggregation für die ESG-Berichterstellung — Schnittstelle zur Berichtssoftware</li><li>Echtzeit-Dashboard zum Berichtsfortschritt</li></ul></div><div class="case-col fragment result"><div class="case-col-head">Ergebnis</div><ul><li>90 % weniger Ressourcenaufwand</li><li>Volle Compliance &amp; Auditierbarkeit</li><li>Team fokussiert auf Kernaufgaben</li><li>Zentralisierte Datenbasis mit Top-Datenqualität</li></ul></div></div>
+  </div>
+</section>
+<section id="slide-14" data-layout="case" data-background-color="#0A0E1A">
+  <div class="wd-canvas dark s-case">
+<div class="case-badge">Case Study</div>
+<h2 class="case-title">Intelligenter Assistent für die Produktions- und Netzplanung</h2>
+<div class="case-meta">Lichtenheldt GmbH · 250 Mitarbeitende · Pharmazeutische Auftragsproduktion</div>
+<div class="case-cols"><div class="case-col fragment"><div class="case-col-head">Ausgangslage</div><ul><li>ERP-System: Aufträge, Material, Rezepturen</li><li>MES/BDE: Maschinendaten, Ist-Zeiten</li><li>Historische Produktionspläne</li><li>Regulatorik: GMP, Pharma-Vorgaben</li></ul></div><div class="case-col fragment"><div class="case-col-head">KI-Produktionsassistent</div><ul><li>Nativ in die bestehende Planungsoberfläche integriert</li><li>Vorausschauende Planung von Produktionsabläufen &amp; Maschinennutzung</li><li>Intelligente Prozessoptimierung in der Logistik über Algorithmen</li></ul></div><div class="case-col fragment result"><div class="case-col-head">Ergebnis</div><ul><li>Nachhaltig abrufbares Expertenwissen entlastet den Arbeitsalltag</li><li>Kostensenkung &amp; Effizienzsteigerung</li></ul></div></div>
+  </div>
+</section>
+<section id="slide-15" data-layout="case" data-background-color="#0A0E1A">
+  <div class="wd-canvas dark s-case">
+<div class="case-badge">Case Study</div>
+<h2 class="case-title">KI-basierte ECTS-Verrechnung in Zulassungsverfahren</h2>
+<div class="case-meta">Private Hochschule · 50.000 Studierende · Öffentlicher Sektor / Bildung</div>
+<div class="case-cols"><div class="case-col fragment"><div class="case-col-head">Herausforderung</div><ul><li>Allgemeine Verwaltungsarbeit: Einlesen und Auswerten von Dokumenten</li><li>Prüfung von Zulassungsvoraussetzungen: An- und Verrechnung von ECTS-Punkten</li><li>Wahrung der DSGVO: Schutz sensibler personenbezogener Daten</li></ul></div><div class="case-col fragment"><div class="case-col-head">skillbyte-Lösung</div><ul><li>Automatisiertes Einlesen &amp; Auswerten der Dokumente</li><li>KI-gestützte An- und Verrechnung von ECTS-Punkten</li><li>DSGVO-konforme Verarbeitung sensibler Daten</li></ul></div><div class="case-col fragment result"><div class="case-col-head">Ergebnis</div><ul><li>Beschleunigte Zulassungsprozesse</li><li>Minimierte Fehleranfälligkeit in der Analyse</li><li>Freie Ressourcen für die persönliche Beratung von Studierenden</li><li>Erhöhte Zufriedenheit mit Zulassungsverfahren und -beratung</li></ul></div></div>
+  </div>
+</section>
+<section id="slide-16" data-layout="case" data-background-color="#0A0E1A">
+  <div class="wd-canvas dark s-case">
+<div class="case-badge">Case Study</div>
+<h2 class="case-title">KI-gestützte Optimierung von Prozess- und Produktqualität</h2>
+<div class="case-meta">Mittelständisches Unternehmen · &gt; 70 Mitarbeitende · Chemie (Kautschuk-Herstellung)</div>
+<div class="case-cols"><div class="case-col fragment"><div class="case-col-head">Herausforderung</div><ul><li>Verzögerte Problemerkennung in der Herstellung von Gummi-Produkten</li><li>Auslieferung fehlerhafter Batches an Kunden</li><li>Semi-automatische Datenerfassung statt Echtzeit-Auswertung</li></ul></div><div class="case-col fragment"><div class="case-col-head">skillbyte-Lösung</div><ul><li>Grenzwertprognosen per Timeseries Forecasting</li><li>Automatisierte Ausreißer-Erkennung</li><li>Echtzeitauswertung von Messdaten mit automatischem Alarm</li></ul></div><div class="case-col fragment result"><div class="case-col-head">Ergebnis</div><ul><li>Prophylaktische Erkennung von Qualitätseinbußen</li><li>Massive Reduzierung von Produktionsfehlern</li><li>Signifikante Zeit- und Kosteneinsparungen</li></ul></div></div>
+  </div>
+</section>
+<section id="slide-17" data-layout="quote" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-quote">
+<blockquote>Eine passgenaue KI-Lösung optimiert Ihre Geschäftsprozesse signifikant — und verschafft Ihnen einen echten Wettbewerbsvorteil.</blockquote>
+<div class="by">skillbyte</div>
+  </div>
+</section>
+<section id="slide-18" data-layout="people" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-people">
+<h2>Erkunden Sie Ihre KI-Möglichkeiten mit uns</h2>
+<div class="people-sub">Drei Ansprechpartner, ein Ziel: Business-Value durch KI im Mittelstand.</div>
+<div class="people-grid"><div class="people-card fragment"><img src="assets/person-ighani.jpg" alt="Masiar Ighani"><div class="people-name">Masiar Ighani</div><div class="people-title">Gründer &amp; Geschäftsführer</div><div class="people-desc">Ihr Experte für die KI-Strategie im Mittelstand</div></div><div class="people-card fragment"><img src="assets/person-weiden.jpg" alt="Dr. Andreas Weiden"><div class="people-name">Dr. Andreas Weiden</div><div class="people-title">Head of AI – Technical</div><div class="people-desc">Ihr Experte für die technische Umsetzbarkeit</div></div><div class="people-card fragment"><img src="assets/person-klein.jpg" alt="Hendrik Klein"><div class="people-name">Hendrik Klein</div><div class="people-title">Head of Business Development</div><div class="people-desc">Ihr Kontakt für Business-Value durch KI</div></div></div>
+  </div>
+</section>
+<section id="slide-19" data-layout="two-col" data-background-color="#FFFFFF">
+  <div class="wd-canvas s-two-col">
+<div><div class="col-head">Wir freuen uns auf den Austausch mit Ihnen!</div><div class="col-body">Erkunden Sie Ihre KI-Möglichkeiten gemeinsam mit uns — von der ersten Idee bis zur produktiven Lösung.</div></div><div class="col-panel"><ul><li>+49 221 95490614</li><li>info@skillbyte.de</li><li>Zollstockgürtel 57, 50969 Köln</li></ul></div>
+  </div>
+</section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js-menu@2.1.0/menu.js"></script>
+<script class="wd-rc">
+/* rich-components.js (webdeck edition) — terminal + chat rich layouts for an
+ * INTERACTIVE reveal.js page. Ported from templates/deck-md/lib/rich-components.js.
+ *
+ * DIFFERENCE FROM THE VIDEO EDITION: the deck-md version is "seek-safe" — every
+ * reveal is a GSAP tween on a PAUSED timeline that the renderer seeks. Here the
+ * page is user-paced, so the seek-safe makeRevealEngine() is GONE. Step-by-step
+ * reveal of terminal lines / chat turns is done with reveal.js FRAGMENTS: each
+ * line/turn is built with class="fragment", and reveal.js reveals them one nav
+ * step at a time. (Build the DOM BEFORE Reveal.initialize() so reveal registers
+ * the fragments — init.js does this.)
+ *
+ * Dependency-free UMD: a plain <script> exposes window.RC; bun/node require/import
+ * gets the named exports (so the parser stays unit-testable). */
+;(function (root, factory) {
+  var api = factory();
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else root.RC = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+
+  var TERM_KINDS = ["cmd", "out", "prompt", "think", "tool", "res", "err", "say", "cmt"];
+
+  // Strip an optional surrounding ``` fence for `name`; pull title="..." from the
+  // info string. Lenient: if no fence, treat the whole input as the body.
+  function stripFence(input, name) {
+    var lines = String(input).replace(/\r\n/g, "\n").split("\n");
+    var open = -1, close = -1, title = "";
+    for (var i = 0; i < lines.length; i++) {
+      var s = lines[i].trim();
+      if (open === -1) {
+        var m = s.match(new RegExp("^```\\s*" + name + "\\b(.*)$"));
+        if (m) { open = i; var tm = m[1].match(/title\s*=\s*"([^"]*)"/); if (tm) title = tm[1]; }
+      } else if (s === "```") { close = i; break; }
+    }
+    if (open === -1) return { title: title, body: lines };
+    var end = close === -1 ? lines.length : close;
+    return { title: title, body: lines.slice(open + 1, end) };
+  }
+
+  function parseTerminalDSL(input) {
+    var f = stripFence(input, "terminal");
+    var units = [];
+    f.body.forEach(function (raw) {
+      if (raw.trim() === "") return;
+      var m = raw.match(/^([a-zA-Z]+):\s*(.*)$/);
+      if (m && TERM_KINDS.indexOf(m[1]) !== -1) units.push({ kind: m[1], text: m[2] });
+      else if (units.length) units[units.length - 1].text += "\n" + raw.trim();
+      else units.push({ kind: "out", text: raw.trim() });
+    });
+    return { title: f.title, lines: units };
+  }
+
+  function parseChatDSL(input) {
+    var f = stripFence(input, "chat");
+    var turns = [];
+    f.body.forEach(function (raw) {
+      if (raw.trim() === "") return;
+      var m = raw.match(/^(user|assistant|system):\s*(.*)$/);
+      if (m) turns.push({ role: m[1], text: m[2] });
+      else if (turns.length) turns[turns.length - 1].text += "\n" + raw.trim();
+      // a leading non-role line with no prior turn has no role to attach -> skip
+    });
+    return { title: f.title, turns: turns };
+  }
+
+  // ---- DOM builders (browser only) ----
+  function _el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+  var TERM_SIGIL = { cmd: "$ ", out: "", prompt: "▸ ", think: "", tool: "→ ", res: "✓ ", err: "✗ ", say: "● ", cmt: "# " };
+
+  // opts.fragments: when true, each line/turn is a reveal.js .fragment (revealed
+  // one nav step at a time). When false, everything is shown at once.
+  function renderTerminal(root, input, opts) {
+    opts = opts || {};
+    var rootEl = typeof root === "string" ? document.querySelector(root) : root;
+    var parsed = parseTerminalDSL(input);
+    var idp = opts.idPrefix || rootEl.id || "term";
+    rootEl.classList.add("term");
+    rootEl.innerHTML = "";
+    var bar = _el("div", "term-bar");
+    ["r", "y", "g"].forEach(function (c) { bar.appendChild(_el("span", "term-dot term-dot-" + c)); });
+    bar.appendChild(_el("span", "term-title", parsed.title || opts.title || ""));
+    rootEl.appendChild(bar);
+    var body = _el("div", "term-body");
+    rootEl.appendChild(body);
+    var ids = [];
+    parsed.lines.forEach(function (ln, i) {
+      var line = _el("div", "term-line t-" + ln.kind + (opts.fragments ? " fragment" : ""));
+      line.id = idp + "-l" + (i + 1);
+      var sig = TERM_SIGIL[ln.kind] || "";
+      if (sig) line.appendChild(_el("span", "t-sigil", sig));
+      line.appendChild(_el("span", "t-text", ln.text));
+      body.appendChild(line);
+      ids.push("#" + line.id);
+    });
+    return { lines: ids, title: parsed.title || "" };
+  }
+
+  function renderChat(root, input, opts) {
+    opts = opts || {};
+    var rootEl = typeof root === "string" ? document.querySelector(root) : root;
+    var parsed = parseChatDSL(input);
+    var idp = opts.idPrefix || rootEl.id || "chat";
+    var label = { user: "You", assistant: "Assistant", system: "System" };
+    rootEl.classList.add("chat");
+    rootEl.innerHTML = "";
+    var ids = [];
+    parsed.turns.forEach(function (turn, i) {
+      var row = _el("div", "chat-row chat-" + turn.role + (opts.fragments ? " fragment" : ""));
+      row.id = idp + "-t" + (i + 1);
+      row.appendChild(_el("div", "chat-role", label[turn.role] || turn.role));
+      row.appendChild(_el("div", "chat-bubble", turn.text));
+      rootEl.appendChild(row);
+      ids.push("#" + row.id);
+    });
+    return { turns: ids };
+  }
+
+  return {
+    parseTerminalDSL: parseTerminalDSL,
+    parseChatDSL: parseChatDSL,
+    renderTerminal: renderTerminal,
+    renderChat: renderChat,
+  };
+});
+
+</script>
+<script>window.WD_CONFIG={"transition": "slide", "slug": "skillbyte-ki-mittelstand"};</script>
+<script class="wd-init">
+/* init.js (webdeck) — wires reveal.js + the house rich components + the GSAP
+ * "concept animation" registry. Inlined into the built page after RC + the CDN
+ * libs (Reveal, RevealHighlight, RevealMenu, gsap). Reads window.WD_CONFIG
+ * (transition/slug/etc.) emitted by the builder just above this script.
+ *
+ * RUNTIME MODEL (the opposite of the video pipeline): this page is user-paced and
+ * event-driven. reveal.js owns navigation (scroll / arrows / space / next-button /
+ * swipe / menu / progress / hash deep-links). Step reveals use reveal FRAGMENTS.
+ * GSAP runs LIVE (not a paused seeked timeline) on slide-enter — so setTimeout,
+ * CSS transitions, onComplete, normal gsap.timeline() are all fine here. The
+ * "seek-safe" contract from .claude/rules/scripted-reveal.md does NOT apply. */
+(function () {
+  "use strict";
+  var CFG = window.WD_CONFIG || {};
+
+  /* ── 1. The concept-animation registry ─────────────────────────────────────
+     A deck layers GSAP on the 3–5 slides that earn it (concept-animation.md
+     budget). Add, in a <script> AFTER this one:
+        WD.register("slide-3", function (section, tl, gsap) {
+          tl.from(section.querySelectorAll(".s-bullets li"),
+                  { x: -40, opacity: 0, stagger: 0.15, ease: "back.out(1.4)" });
+        });
+     The builder gives every <section> a stable id (slide-1, slide-2, …).
+     buildFn is replayed on every ENTER (incl. back-nav), so it MUST be
+     idempotent — animate FROM a hidden state TO the resting state each time. */
+  var registry = {};
+  var WD = {
+    register: function (slideId, buildFn) { registry[slideId] = buildFn; },
+    _registry: registry,
+    play: function (section) {
+      if (!section) return;
+      var fn = registry[section.id];
+      if (!fn || typeof window.gsap === "undefined") return;
+      var tl = window.gsap.timeline();   // live (not paused) — plays in real time
+      try { fn(section, tl, window.gsap); } catch (e) { console.warn("WD anim error", section.id, e); }
+    },
+  };
+  window.WD = WD;
+
+  /* ── 2. Build rich components (terminal/chat) BEFORE Reveal.initialize ───────
+     so reveal registers their .fragment lines. Each mount is a div.wd-rich
+     [data-kind="terminal"|"chat"] wrapping a script[type=text/plain].wd-src that
+     carries the raw DSL; we read its textContent, then RC builds the DOM. */
+  function buildRich() {
+    if (typeof window.RC === "undefined") return;
+    document.querySelectorAll(".wd-rich").forEach(function (mount) {
+      var srcEl = mount.querySelector("script.wd-src");
+      var src = srcEl ? srcEl.textContent : "";
+      var kind = mount.getAttribute("data-kind");
+      var title = mount.getAttribute("data-title") || "";
+      if (kind === "terminal") window.RC.renderTerminal(mount, src, { fragments: true, title: title });
+      else if (kind === "chat") window.RC.renderChat(mount, src, { fragments: true });
+    });
+  }
+
+  /* ── 3. Initialize reveal.js ─────────────────────────────────────────────── */
+  function init() {
+    buildRich();
+    var plugins = [];
+    if (typeof window.RevealHighlight !== "undefined") plugins.push(window.RevealHighlight);
+    if (typeof window.RevealMenu !== "undefined") plugins.push(window.RevealMenu);
+
+    window.Reveal.initialize({
+      width: 1920,
+      height: 1080,
+      margin: 0,
+      minScale: 0.1,
+      maxScale: 2.0,
+      hash: true,                 // per-slide URL deep-links
+      slideNumber: "c/t",
+      controls: true,
+      progress: true,
+      center: false,              // our .wd-canvas does its own centering
+      transition: CFG.transition || "slide",
+      backgroundTransition: "fade",
+      plugins: plugins,
+      menu: {                     // reveal.js-menu options (no-op if plugin absent)
+        themes: false, transitions: false, openButton: true, numbers: true,
+      },
+    }).then(function () {
+      WD.play(window.Reveal.getCurrentSlide());
+    });
+
+    // Replay the slide's GSAP concept animation on every enter (incl. back-nav).
+    window.Reveal.on("slidechanged", function (e) { WD.play(e.currentSlide); });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+</script>
+<!-- GSAP concept animations (concept-animation.md budget: 3-5 slides max). Add:
+     WD.register("slide-N", function (section, tl, gsap) { ...idempotent... }); -->
+</body>
+</html>

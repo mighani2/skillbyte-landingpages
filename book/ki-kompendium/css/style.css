@@ -1305,9 +1305,12 @@ ul#client-area-tab.uk-tab > li.uk-width-1-2 {
 }
 .idz-subscription-form input[type] {
     font-size: 14px;
-    text-transform: lowercase;
     border-radius: 3px;
-    color: #cccccc;
+    color: #1f2937;
+}
+.idz-subscription-form input::placeholder {
+    color: #6b7280;
+    opacity: 1;
 }
 .idz-subscription-form p {
     color: #4b4b4b;
@@ -1316,17 +1319,18 @@ ul#client-area-tab.uk-tab > li.uk-width-1-2 {
     position: relative;
 }
 .idz-form .uk-button {
-    position: absolute;
-    right: 0;
-    bottom: 0px;
+    position: static;
     color: #ffffff;
     background-color: #f3a612;
-    padding: 5px 15px;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 4px;
+    margin-top: 16px;
 }
 .idz-form .uk-button:hover {
-    opacity: .8;
+    opacity: .9;
+    color: #ffffff;
 }
 .idz-form .uk-button i {
     margin-right: 8px;
